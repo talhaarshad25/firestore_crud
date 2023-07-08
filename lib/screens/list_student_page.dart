@@ -2,6 +2,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firestore_crud/screens/udpate_student_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class listStudentPage extends StatefulWidget {
   const listStudentPage({Key? key}) : super(key: key);
@@ -15,9 +17,28 @@ class _listStudentPageState extends State<listStudentPage> {
   //fetch collections from firebase firestore
   final Stream<QuerySnapshot> studentsstream = FirebaseFirestore.instance.collection('students').snapshots();
 
-  
-  deleteuser(id){
-    print('user deleted $id');
+  // For deleteing user
+  CollectionReference students= FirebaseFirestore.instance.collection('students');
+  Future<void> deleteuser(id){
+    // print('user deleted $id');
+    return students.doc(id).delete().then((value) => Fluttertoast.showToast(
+      msg: "User Deleted",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    ))
+        .catchError((error)=>Fluttertoast.showToast(
+      msg: "Failed to Delete user: $error",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    ) );
   }
 
 
@@ -38,6 +59,7 @@ class _listStudentPageState extends State<listStudentPage> {
         Snapshot.data!.docs.map((DocumentSnapshot document){
             Map a =  document.data() as Map<String, dynamic >;
             storedocs.add(a);
+            a['id']=document.id;
         }).toList();
 
 
@@ -97,9 +119,9 @@ class _listStudentPageState extends State<listStudentPage> {
                             child: Row(
                               children: [
                                 IconButton(onPressed: ()=>{Navigator.push(context,
-                                    MaterialPageRoute(builder: (context)=>UpdateStudentPage(),))},
+                                    MaterialPageRoute(builder: (context)=>UpdateStudentPage(id: storedocs[i]['id']),))},
                                   icon: Icon(Icons.edit),color: Colors.orange,),
-                                IconButton(onPressed: ()=>{print(storedocs)},
+                                IconButton(onPressed: ()=>{deleteuser(storedocs[i]['id'])},
                                   icon: Icon(Icons.delete),color: Colors.red,),
                               ],
                             )

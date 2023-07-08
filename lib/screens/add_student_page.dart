@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddStudentPage extends StatefulWidget {
   const AddStudentPage({Key? key}) : super(key: key);
@@ -33,8 +35,27 @@ class _AddStudentPageState extends State<AddStudentPage> {
     passController.clear();
   }
 
-  addUser() {
-    print('user added');
+  //For adding user
+  CollectionReference students= FirebaseFirestore.instance.collection('students');
+  Future<void>addUser() {
+    return students.add({'name':name,'email':email,'password':password}).then((value) => Fluttertoast.showToast(
+      msg: "User Added",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    ))
+        .catchError((error)=>Fluttertoast.showToast(
+      msg: "Failed to Added user: $error",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    ) );
   }
 
   @override
